@@ -8,38 +8,34 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
-const message = ref('')
-const error = ref('')
-const errorDetails = ref('')
+const message = ref<string>('')
+const error = ref<string>('')
+const errorDetails = ref<string>('')
 
-const fetchMessage = async () => {
+const fetchMessage = async (): Promise<void> => {
   try {
     error.value = ''
     errorDetails.value = ''
-    console.log('Making request to /api/hello')
     const response = await axios({
       method: 'get',
       url: '/api/hello',
       headers: {
         'Content-Type': 'application/json',
       },
-      timeout: 5000 // Add timeout to prevent hanging
+      timeout: 5000
     })
-    console.log('Response received:', response.data)
     message.value = response.data.message
   } catch (err) {
-    console.error('Error details:', err)
-    error.value = `Error: ${err.message}`
-    if (err.response) {
-      errorDetails.value = `Status: ${err.response.status}\nData: ${JSON.stringify(err.response.data, null, 2)}`
-    } else if (err.code === 'ECONNREFUSED') {
-      errorDetails.value = 'Connection refused. Please check if the backend service is running.'
+    const axiosError = err as AxiosError
+    error.value = `Error: ${axiosError.message}`
+    if (axiosError.response) {
+      errorDetails.value = `Status: ${axiosError.response.status}\nData: ${JSON.stringify(axiosError.response.data, null, 2)}`
     } else {
-      errorDetails.value = `No response received: ${err.message}`
+      errorDetails.value = `No response received: ${axiosError.message}`
     }
     message.value = ''
   }
@@ -83,4 +79,5 @@ button:hover {
   white-space: pre-wrap;
   font-family: monospace;
 }
-</style> 
+
+</style>
