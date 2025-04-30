@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { fileURLToPath } from 'url'
 import { dirname } from 'path'
+import { NodePackageImporter } from 'sass-embedded'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -31,6 +32,11 @@ export default defineConfig({
     }
   },
   css: {
-    devSourcemap: true
-  }
-}) 
+    devSourcemap: true,
+    preprocessorOptions: {
+      scss: {
+        api: "modern",
+      },
+    },
+  },
+})
